@@ -16,10 +16,13 @@ These are docker images for [Unifi](https://www.ui.com/software/) running on an 
 ## Volumes
 
 * /var/lib/unifi
+* /var/log/unifi
+* /var/run/unifi
 
 
 ## Ports
 
+* 8080
 * 8443
 
 
