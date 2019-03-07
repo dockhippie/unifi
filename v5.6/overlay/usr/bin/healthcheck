@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 source /usr/bin/entrypoint
 
-CHECK="$(curl -sL -w %{http_code} -o /dev/null ${UNIFI_HEALTHCHECK_URL})"
+CHECK="$(curl --insecure -sL -w %{http_code} -o /dev/null ${UNIFI_HEALTHCHECK_URL})"
 
 if [[ "${CHECK}" == "${UNIFI_HEALTHCHECK_CODE}" ]]
 then

@@ -46,7 +46,7 @@ declare -x UNIFI_HEALTHCHECK_URL
 [[ -z "${UNIFI_HEALTHCHECK_URL}" ]] && UNIFI_HEALTHCHECK_URL="https://localhost:8443"
 
 declare -x UNIFI_HEALTHCHECK_CODE
-[[ -z "${UNIFI_HEALTHCHECK_CODE}" ]] && UNIFI_HEALTHCHECK_CODE="302"
+[[ -z "${UNIFI_HEALTHCHECK_CODE}" ]] && UNIFI_HEALTHCHECK_CODE="200"
 
 declare -x JAVA_HOME
 [[ -z "${JAVA_HOME}" ]] && JAVA_HOME="/usr/lib/jvm/java-8-openjdk-$(dpkg --print-architecture)"
