@@ -1,4 +1,4 @@
-FROM webhippie/ubuntu:16.04@sha256:094a3fa5ef66fa0b7f07bb21cdcb016f34c8431b35bab68a33bb2e1bcc81926f
+FROM webhippie/ubuntu:16.04
 
 LABEL maintainer="Thomas Boerger <thomas@webhippie.de>" \
   org.label-schema.name="Unifi" \
