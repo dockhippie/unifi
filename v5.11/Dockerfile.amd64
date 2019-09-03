@@ -1,8 +1,8 @@
-FROM webhippie/ubuntu:16.04-arm32v7
+FROM webhippie/ubuntu:16.04
 
 LABEL maintainer="Thomas Boerger <thomas@webhippie.de>" \
   org.label-schema.name="Unifi" \
-  org.label-schema.version="latest" \
+  org.label-schema.version="5.11" \
   org.label-schema.vendor="Thomas Boerger" \
   org.label-schema.schema-version="1.0"
 
@@ -24,10 +24,10 @@ RUN apt-get update -y && \
   ar x /tmp/unifi_sysvinit_all.deb && \
   tar xf data.tar.xz && \
   cp -rf usr/lib/unifi /usr/lib/ && \
-  mkdir -p /usr/lib/unifi/bin && \
+  rm /usr/lib/unifi/bin/* && \
   ln -sf /usr/bin/mongod /usr/lib/unifi/bin/mongod && \
   apt-get autoremove -y && \
   apt-get clean -y && \
-  rm -rf /var/lib/apt/lists/* /tmp/unifi* /usr/lib/unifi/bin
+  rm -rf /var/lib/apt/lists/* /tmp/unifi*
 
-COPY ./overlay ./overlay-arm32v7 /
+COPY ./overlay ./overlay-amd64 /
