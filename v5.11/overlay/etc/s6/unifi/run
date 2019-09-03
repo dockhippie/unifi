@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [ -f ./setup ]
+then
+  source ./setup
+fi
+
+if [ -f ./custom ]
+then
+  source ./custom
+fi
+
+if [ -d ./custom.d ]
+then
+  for FILE in $(find ./custom.d -type f -iname \*.sh | sort)
+  do
+    source ${FILE}
+  done
+fi
+
+STARTCMD="java -cp /usr/lib/unifi/lib/ace.jar -Djava.awt.headless=true -Dfile.encoding=UTF-8"
+
+[[ -n "${UNIFI_DATA_DIR}" ]] && STARTCMD="${STARTCMD} -Dunifi.datadir=${UNIFI_DATA_DIR}"
+[[ -n "${UNIFI_LOG_DIR}" ]] && STARTCMD="${STARTCMD} -Dunifi.logsdir=${UNIFI_LOG_DIR}"
+[[ -n "${UNIFI_RUN_DIR}" ]] && STARTCMD="${STARTCMD} -Dunifi.rundir=${UNIFI_RUN_DIR}"
+[[ -n "${UNIFI_HTTP_PORT}" ]] && STARTCMD="${STARTCMD} -Dunifi.http.port=${UNIFI_HTTP_PORT}"
+[[ -n "${UNIFI_HTTPS_PORT}" ]] && STARTCMD="${STARTCMD} -Dunifi.https.port=${UNIFI_HTTPS_PORT}"
+[[ -n "${UNIFI_MONGODB_NOJOURNAL}" ]] && STARTCMD="${STARTCMD} -Dunifi.db.nojournal=${UNIFI_MONGODB_NOJOURNAL}"
+[[ -n "${UNIFI_MONGODB_EXTRAARGS}" ]] && STARTCMD="${STARTCMD} -Dunifi.db.extraargs=${UNIFI_MONGODB_EXTRAARGS}"
+[[ -n "${UNIFI_ENTROPY_GATHER_DEVICE}" ]] && STARTCMD="${STARTCMD} -Djava.security.egd=${UNIFI_ENTROPY_GATHER_DEVICE}"
+[[ -n "${UNIFI_JVM_MAX_HEAP_SIZE}" ]] && STARTCMD="${STARTCMD} -Xmx${UNIFI_JVM_MAX_HEAP_SIZE}"
+[[ -n "${UNIFI_JVM_INIT_HEAP_SIZE}" ]] && STARTCMD="${STARTCMD} -Xms${UNIFI_JVM_INIT_HEAP_SIZE}"
+[[ -n "${UNIFI_JVM_EXTRA_OPTS}" ]] && STARTCMD="${STARTCMD} ${UNIFI_JVM_EXTRA_OPTS}"
+
+pushd ${UNIFI_SOURCE_DIR} > /dev/null
+	echo "> starting unifi service"
+  exec su-exec unifi ${STARTCMD} ${UNIFI_MAIN_CLASS} start
+popd > /dev/null
