@@ -9,6 +9,7 @@ These are docker images for [Unifi](https://www.ui.com/software/) running on an 
 ## Versions
 
 * [latest](./latest) available as `webhippie/unifi:latest`
+* [5.11](./v5.11) available as `webhippie/unifi:5.11`
 * [5.10](./v5.10) available as `webhippie/unifi:5.10`
 * [5.6](./v5.6) available as `webhippie/unifi:5.6`
 
