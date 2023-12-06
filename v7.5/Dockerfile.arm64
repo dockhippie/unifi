@@ -1,0 +1,28 @@
+FROM ghcr.io/dockhippie/ubuntu:20.04-arm64
+
+VOLUME ["/var/lib/unifi", "/var/log/unifi", "/var/run/unifi"]
+EXPOSE 8080 8443
+
+WORKDIR /var/lib/unifi
+CMD ["/usr/bin/container"]
+
+# mongodb got to be >= 3.6.0 and << 5.0.0
+RUN apt-get update && \
+  apt-get upgrade -y && \
+  groupadd -g 1000 unifi && \
+  useradd -u 1000 -d /var/lib/unifi -g unifi -s /bin/bash -M unifi && \
+  apt-get install -y binutils openjdk-17-jre-headless libcap2 mongodb-server && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN curl -sSL -o /tmp/unifi_sysvinit_all.deb https://dl.ubnt.com/unifi/7.5.187/unifi_sysvinit_all.deb && \
+  mkdir /tmp/unifi && \
+  cd /tmp/unifi && \
+  ar x /tmp/unifi_sysvinit_all.deb && \
+  tar xf data.tar.xz && \
+  cp -rf usr/lib/unifi /usr/lib/ && \
+  rm -f /usr/lib/unifi/bin/mongod /usr/lib/unifi/bin/unifi.init && \
+  ln -sf /usr/bin/mongod /usr/lib/unifi/bin/mongod && \
+  rm -rf /tmp/unifi*
+
+COPY ./overlay /

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -eo pipefail
 source /usr/bin/entrypoint
 
 CHECK="$(curl --insecure -sL -w %{http_code} -o /dev/null ${UNIFI_HEALTHCHECK_URL})"
