@@ -1,33 +1,28 @@
-FROM webhippie/ubuntu:16.04-amd64
-
-LABEL maintainer="Thomas Boerger <thomas@webhippie.de>" \
-  org.label-schema.name="Unifi" \
-  org.label-schema.version="5.10" \
-  org.label-schema.vendor="Thomas Boerger" \
-  org.label-schema.schema-version="1.0"
-
-EXPOSE 8080 8443
+FROM ghcr.io/dockhippie/ubuntu:20.04-amd64
 
 VOLUME ["/var/lib/unifi", "/var/log/unifi", "/var/run/unifi"]
-WORKDIR /var/lib/unifi
-ENTRYPOINT ["/usr/bin/entrypoint"]
-CMD ["/bin/s6-svscan", "/etc/s6"]
+EXPOSE 8080 8443
 
-RUN apt-get update -y && \
+WORKDIR /var/lib/unifi
+CMD ["/usr/bin/container"]
+
+# mongodb got to be >= 2.4.10 and << 3.6.0
+RUN apt-get update && \
   apt-get upgrade -y && \
   groupadd -g 1000 unifi && \
   useradd -u 1000 -d /var/lib/unifi -g unifi -s /bin/bash -M unifi && \
-  apt-get install -y openjdk-8-jre-headless libcap2 mongodb-server && \
-  curl -sSL -o /tmp/unifi_sysvinit_all.deb https://dl.ubnt.com/unifi/5.10.27/unifi_sysvinit_all.deb && \
+  apt-get install -y binutils openjdk-8-jre-headless libcap2 jsvc mongodb-server && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN curl -sSL -o /tmp/unifi_sysvinit_all.deb https://dl.ubnt.com/unifi/5.10.27/unifi_sysvinit_all.deb && \
   mkdir /tmp/unifi && \
   cd /tmp/unifi && \
   ar x /tmp/unifi_sysvinit_all.deb && \
   tar xf data.tar.xz && \
   cp -rf usr/lib/unifi /usr/lib/ && \
-  rm /usr/lib/unifi/bin/* && \
+  rm -f /usr/lib/unifi/bin/mongod /usr/lib/unifi/bin/unifi.init && \
   ln -sf /usr/bin/mongod /usr/lib/unifi/bin/mongod && \
-  apt-get autoremove -y && \
-  apt-get clean -y && \
-  rm -rf /var/lib/apt/lists/* /tmp/unifi*
+  rm -rf /tmp/unifi*
 
-COPY ./overlay ./overlay-amd64 /
+COPY ./overlay /

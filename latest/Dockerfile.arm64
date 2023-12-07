@@ -1,0 +1,24 @@
+FROM ghcr.io/dockhippie/ubuntu:20.04-arm64
+
+VOLUME ["/var/lib/unifi", "/var/log/unifi", "/var/run/unifi"]
+EXPOSE 8080 8443
+
+WORKDIR /var/lib/unifi
+CMD ["/usr/bin/container"]
+
+RUN apt-get update && \
+  apt-get install -y lsb-release gnupg2 && \
+  curl -sSLo /etc/apt/trusted.gpg.d/unifi.gpg https://dl.ui.com/unifi/unifi-repo.gpg && \
+  echo "deb https://www.ui.com/downloads/unifi/debian stable ubiquiti" | tee /etc/apt/sources.list.d/unifi.list && \
+  # curl -sSLo- https://www.mongodb.org/static/pgp/server-3.6.asc | gpg --dearmor --output /etc/apt/trusted.gpg.d/mongodb.gpg && \
+  # echo "deb https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.6 multiverse" | tee /etc/apt/sources.list.d/mongodb.list && \
+  apt-get update && \
+  apt-get upgrade -y && \
+  groupadd -g 1000 unifi && \
+  useradd -u 1000 -d /var/lib/unifi -g unifi -s /bin/bash -M unifi && \
+  apt-get install -y mongodb-server unifi && \
+  apt-get purge -y lsb-release gnupg2 && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+COPY ./overlay /
