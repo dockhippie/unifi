@@ -3,5 +3,16 @@
     "extends": [
         "github>dockhippie/.github//renovate/preset"
     ],
-    "packageRules": []
+    "packageRules": [
+        {
+            "datasources": [
+                "docker"
+            ],
+            "updateTypes": [
+                "major",
+                "minor"
+            ],
+            "enabled": false
+        }
+    ]
 }
