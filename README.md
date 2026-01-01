@@ -26,6 +26,8 @@ For the available versions please look at [Docker Hub][dockerhub] or
 
 ```console
 JAVA_HOME = /usr/lib/jvm/java-8-openjdk-$(dpkg --print-architecture)
+PGID = 1000
+PUID = 1000
 UNIFI_CORE_ENABLED = false
 UNIFI_DATA_DIR = /var/lib/unifi
 UNIFI_ENTROPY_GATHER_DEVICE =
@@ -45,6 +47,8 @@ UNIFI_RUN_DIR = /var/run/unifi
 UNIFI_SKIP_CHOWN = false
 UNIFI_SOURCE_DIR = /usr/lib/unifi
 ```
+
+Extracted by the command: `grep -hE ': "\$\{(.*)\}"' latest/overlay/etc/entrypoint.d/*.sh | sed 's/: "\${//' | sed 's/:="/ = /' | sed 's/"}"$//' | sort | uniq`
 
 ## Inherited environment variables
 
