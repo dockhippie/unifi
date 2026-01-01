@@ -26,8 +26,6 @@ For the available versions please look at [Docker Hub][dockerhub] or
 
 ```console
 JAVA_HOME = /usr/lib/jvm/java-8-openjdk-$(dpkg --print-architecture)
-PGID = 1000
-PUID = 1000
 UNIFI_CORE_ENABLED = false
 UNIFI_DATA_DIR = /var/lib/unifi
 UNIFI_ENTROPY_GATHER_DEVICE =
