@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 declare -x JAVA_HOME
-: "${JAVA_HOME:="/usr/lib/jvm/java-8-openjdk-$(dpkg --print-architecture)"}"
+: "${JAVA_HOME:="/usr/lib/jvm/java-25-openjdk-$(dpkg --print-architecture)"}"
 
 declare -x UNIFI_SKIP_CHOWN
 : "${UNIFI_SKIP_CHOWN:="false"}"

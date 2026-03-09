@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 declare -x PUID
-: "${PUID:="1000"}"
+: "${PUID:="1337"}"
 
 declare -x PGID
-: "${PGID:="1000"}"
+: "${PGID:="1337"}"
