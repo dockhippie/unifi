@@ -1,0 +1,39 @@
+FROM ghcr.io/dockhippie/ubuntu:24.04-arm64
+
+VOLUME ["/var/lib/unifi", "/var/log/unifi", "/var/run/unifi"]
+EXPOSE 8080 8443
+
+WORKDIR /var/lib/unifi
+CMD ["/usr/bin/container"]
+
+# mongodb-server (>= 1:3.6.0) | mongodb-10gen (>= 3.6.0) | mongodb-org-server (>= 3.6.0),
+# mongodb-server (<< 1:8.1.0) | mongodb-10gen (<< 8.1.0) | mongodb-org-server (<< 8.1.0),
+# openjdk-17-jre-headless | temurin-17-jre | openjdk-21-jre-headless | temurin-21-jre
+
+RUN apt-get update && \
+  apt-get install -y lsb-release gnupg2 xz-utils && \
+  curl -sSLo- https://www.mongodb.org/static/pgp/server-8.0.asc | gpg --dearmor --output /etc/apt/trusted.gpg.d/mongodb.gpg && \
+  echo "deb https://repo.mongodb.org/apt/ubuntu noble/mongodb-org/8.0 multiverse" | tee /etc/apt/sources.list.d/mongodb.list && \
+  apt-get update && \
+  apt-get upgrade -y && \
+  groupadd -g 1337 unifi && \
+  useradd -u 1337 -d /var/lib/unifi -g unifi -s /bin/bash -M unifi && \
+  apt-get install -y binutils openjdk-21-jre-headless libcap2 mongodb-org-server && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN curl -sSL -o /tmp/unifi_sysvinit_all.deb https://dl.ui.com/unifi/9.1.120/unifi_sysvinit_all.deb && \
+  mkdir /tmp/unifi && \
+  cd /tmp/unifi && \
+  ar x /tmp/unifi_sysvinit_all.deb && \
+  tar xf data.tar.xz && \
+  cp -rf usr/lib/unifi /usr/lib/ && \
+  rm -f /usr/lib/unifi/bin/mongod /usr/lib/unifi/bin/unifi.init && \
+  ln -sf /usr/bin/mongod /usr/lib/unifi/bin/mongod && \
+  rm -rf /tmp/unifi*
+
+COPY ./overlay /
+
+RUN find /etc/container.d /etc/entrypoint.d -type f -name \*.sh -exec sed -i 's/\r$//' {} +; \
+  sed -i 's/\r$//' /usr/bin/healthcheck /usr/bin/container && \
+  chmod +x /usr/bin/healthcheck /usr/bin/container /etc/container.d/*.sh /etc/entrypoint.d/*.sh

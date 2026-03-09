@@ -1,0 +1,146 @@
+---
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
+name: v8.1
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+"on":
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - v8.1/*
+      - .github/workflows/v8.1.yml
+  pull_request:
+    branches:
+      - master
+    paths:
+      - v8.1/*
+      - .github/workflows/v8.1.yml
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        variant:
+          - arch: amd64
+            platform: linux/amd64
+          - arch: arm64
+            platform: linux/arm64
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v6
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          images: |
+            webhippie/unifi
+            quay.io/webhippie/unifi
+            ghcr.io/dockhippie/unifi
+          labels: |
+            org.opencontainers.image.vendor=Webhippie
+            maintainer=Thomas Boerger <thomas@webhippie.de>
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Setup Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Hub login
+        uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Quay login
+        uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Ghcr login
+        uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: v8.1/
+          provenance: false
+          file: v8.1/Dockerfile.${{ matrix.variant.arch }}
+          platforms: ${{ matrix.variant.platform }}
+          push: ${{ github.event_name != 'pull_request' }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: |
+            webhippie/unifi:8.1-${{ matrix.variant.arch }}
+            quay.io/webhippie/unifi:8.1-${{ matrix.variant.arch }}
+            ghcr.io/dockhippie/unifi:8.1-${{ matrix.variant.arch }}
+
+  manifest:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+
+    needs:
+      - docker
+
+    steps:
+      - name: Wait something
+        run: sleep 60
+
+      - name: Hub manifest
+        uses: actionhippie/manifest@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          platforms: linux/amd64,linux/arm64
+          template: webhippie/unifi:8.1-ARCH
+          target: webhippie/unifi:8.1
+          ignore_missing: true
+
+      - name: Quay manifest
+        uses: actionhippie/manifest@v1
+        with:
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+          platforms: linux/amd64,linux/arm64
+          template: quay.io/webhippie/unifi:8.1-ARCH
+          target: quay.io/webhippie/unifi:8.1
+          ignore_missing: true
+
+      - name: Ghcr manifest
+        uses: actionhippie/manifest@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          platforms: linux/amd64,linux/arm64
+          template: ghcr.io/dockhippie/unifi:8.1-ARCH
+          target: ghcr.io/dockhippie/unifi:8.1
+          ignore_missing: true
+
+...
