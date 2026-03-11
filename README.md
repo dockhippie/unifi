@@ -1,8 +1,8 @@
-# Unifi
+# unifi
 
 [![Docker Build](https://github.com/dockhippie/unifi/actions/workflows/docker.yml/badge.svg)](https://github.com/dockhippie/unifi/actions/workflows/docker.yml) [![GitHub Repo](https://img.shields.io/badge/github-repo-yellowgreen)](https://github.com/dockhippie/unifi)
 
-These are docker images for [Unifi][upstream] running on our
+These are docker images for [UniFi][upstream] running on our
 [Ubuntu image][parent].
 
 ## Versions

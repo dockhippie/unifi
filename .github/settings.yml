@@ -1,6 +1,6 @@
 repository:
   name: unifi
-  description: Docker images for unifi
+  description: Docker images for UniFi
   topics: docker, image
 
   private: false
