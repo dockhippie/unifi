@@ -1,4 +1,4 @@
-FROM ghcr.io/dockhippie/ubuntu:24.04-amd64@sha256:97e7865bf5731293df2d03e005e7bc91144672eb05733fed2f402939da31b325
+FROM ghcr.io/dockhippie/ubuntu:24.04-amd64@sha256:91d94aff7e6d04a1c1ad38b4ac021532b80575bd8c9de7ff5551703c5bda01f7
 
 VOLUME ["/var/lib/unifi", "/var/log/unifi", "/var/run/unifi"]
 EXPOSE 8080 8443
